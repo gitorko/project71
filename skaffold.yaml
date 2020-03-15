@@ -1,0 +1,11 @@
+apiVersion: skaffold/v2alpha3
+kind: Config
+build:
+  artifacts:
+    - image: hello-demo
+      jib: {}
+  local: {}
+deploy:
+  kubectl:
+    manifests:
+      - kubernetes/deployment.yaml

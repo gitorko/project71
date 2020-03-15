@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hello-demo-green
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: hello-demo-green
+  template:
+    metadata:
+      labels:
+        app: hello-demo-green
+    spec:
+      containers:
+        - name: hello-demo
+          image: hello-demo:v2
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8080
+              name: http
+          resources:
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hello-demo-green-test
+spec:
+  type: LoadBalancer
+  selector:
+    app: hello-demo-green
+  ports:
+    - name: http
+      port: 8090
+      targetPort: 8080
+      protocol: TCP

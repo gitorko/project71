@@ -1,0 +1,66 @@
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: local-storage
+reclaimPolicy: Retain
+provisioner: kubernetes.io/no-provisioner
+volumeBindingMode: WaitForFirstConsumer
+---
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: pv1
+  namespace: default
+spec:
+  capacity:
+    storage: 2Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: local-storage
+  local:
+    path: /tmp/test/data
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: kubernetes.io/hostname
+              operator: In
+              values:
+                - docker-desktop
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: pvc1
+  namespace: default
+spec:
+  storageClassName: local-storage
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+  labels:
+    app: nginx
+spec:
+  volumes:
+    - name: html
+      persistentVolumeClaim:
+        claimName: pvc1
+  containers:
+    - name: html-updater
+      image: alpine
+      command: ["/bin/sh", "-c"]
+      args:
+        - while true; do date >> /html/index.html; sleep 10; done
+      volumeMounts:
+        - mountPath: /html
+          name: html
+  restartPolicy: Always

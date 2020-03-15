@@ -1,0 +1,20 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: job-counter
+spec:
+  completions: 1
+  parallelism: 1
+  activeDeadlineSeconds: 240
+  template:
+    metadata:
+      name: job-counter
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: job-counter
+          image: alpine
+          command:
+            - "sh"
+            - "-c"
+            - "echo 'test'"

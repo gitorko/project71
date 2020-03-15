@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hello-demo-canary
+  labels:
+    app: hello-demo-canary
+    version: v2
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hello-demo
+      version: v2
+  template:
+    metadata:
+      labels:
+        app: hello-demo
+        version: v2
+    spec:
+      containers:
+        - name: hello-demo
+          image: hello-demo:v2
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8080
+              name: http
+          resources:
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hello-demo-svc
+spec:
+  type: LoadBalancer
+  selector:
+    app: hello-demo
+  ports:
+    - name: http
+      port: 8080
+      protocol: TCP

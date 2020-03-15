@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: hello-demo-svc
+spec:
+  type: LoadBalancer
+  selector:
+    app: hello-demo-green
+  ports:
+    - name: http
+      port: 8080
+      protocol: TCP

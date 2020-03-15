@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hello-demo-blue
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: hello-demo-blue
+  template:
+    metadata:
+      labels:
+        app: hello-demo-blue
+    spec:
+      containers:
+        - name: hello-demo
+          image: hello-demo:v1
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8080
+              name: http
+          resources:
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hello-demo-svc
+spec:
+  type: LoadBalancer
+  selector:
+    app: hello-demo-blue
+  ports:
+    - name: http
+      port: 8080
+      protocol: TCP
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hello-demo-blue-test
+spec:
+  type: LoadBalancer
+  selector:
+    app: hello-demo-blue
+  ports:
+    - name: http
+      port: 8085
+      targetPort: 8080
+      protocol: TCP
