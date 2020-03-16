@@ -3,8 +3,15 @@ kind: ConfigMap
 metadata:
   name: app-setting
 data:
-  key: value
   prop1: prop1value
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: app-password
+type: Opaque
+data:
+  prop2: dGVzdHBhc3N3b3Jk
 ---
 apiVersion: v1
 kind: Pod
@@ -18,10 +25,12 @@ spec:
       envFrom:
         - configMapRef:
             name: app-setting
+        - secretRef:
+            name: app-password
       args:
         - /bin/sh
         - "-c"
-        - "echo $(prop1)"
+        - "echo $(prop1); echo $(prop2); echo test"
   restartPolicy: Never
 
 
